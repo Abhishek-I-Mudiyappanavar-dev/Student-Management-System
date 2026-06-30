@@ -46,3 +46,25 @@ Throughout the project, I will build production-oriented APIs while learning cor
 * Develop backend applications following industry best practices
 
 This project is the second step in my backend development roadmap, with the goal of becoming a proficient Spring Boot backend developer capable of designing scalable, maintainable, and production-ready applications.
+
+## Folder Structure
+```
+src
+└── main
+    ├── controller
+    ├── dto
+    │    ├── request
+    │    └── response
+    ├── entity
+    ├── enums        
+    ├── repository
+    ├── service
+    │     └── impl
+    ├── mapper
+    ├── exception
+    ├── advice
+    ├── config
+    ├── util
+    ├── validation
+    └── constants
+```
