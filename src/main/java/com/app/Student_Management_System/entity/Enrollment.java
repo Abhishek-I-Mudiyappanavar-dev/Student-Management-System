@@ -3,6 +3,7 @@ package com.app.Student_Management_System.entity;
 import com.app.Student_Management_System.enums.EnrollmentStatus;
 import com.app.Student_Management_System.enums.Semester;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,6 +16,11 @@ import java.time.LocalDateTime;
         @UniqueConstraint(columnNames = {"student_id", "course_id"})
     }
 )
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Enrollment {
 
     @Id

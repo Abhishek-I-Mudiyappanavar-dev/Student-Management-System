@@ -2,6 +2,7 @@ package com.app.Student_Management_System.entity;
 
 import com.app.Student_Management_System.enums.Gender;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -10,6 +11,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "students")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Student {
 
     @Id
@@ -30,9 +36,6 @@ public class Student {
 
     @Column(length = 15)
     private String phoneNumber;
-
-    @Column(nullable = false)
-    private Integer earnedCredits;
 
     @Column
     private LocalDate dateOfBirth;

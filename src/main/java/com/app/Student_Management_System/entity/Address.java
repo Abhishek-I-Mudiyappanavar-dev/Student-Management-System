@@ -1,9 +1,15 @@
 package com.app.Student_Management_System.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "addresses")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Address {
 
     @Id

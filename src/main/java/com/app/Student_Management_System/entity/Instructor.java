@@ -2,6 +2,7 @@ package com.app.Student_Management_System.entity;
 
 import com.app.Student_Management_System.enums.Designation;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -9,6 +10,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "instructors")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Instructor {
 
     @Id

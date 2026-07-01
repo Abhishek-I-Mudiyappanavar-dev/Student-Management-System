@@ -1,6 +1,7 @@
 package com.app.Student_Management_System.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,6 +15,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "departments")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Department {
 
     @Id
