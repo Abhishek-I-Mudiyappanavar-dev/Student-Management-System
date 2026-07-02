@@ -8,12 +8,13 @@ import com.app.Student_Management_System.mapper.StudentMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
 import com.app.Student_Management_System.repository.StudentRepository;
 import com.app.Student_Management_System.service.StudentService;
+import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,9 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentResponse admitStudent(StudentRequest request) {
 
+        if(studentRepository.findByEmail(request.getEmail()).isPresent()){
+            throw new DuplicateRequestException("Email already exists: "+request.getEmail());
+        }
         Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> new NoSuchElementException("There is no department with id: "+request.getDepartmentId()));
         Student student = studentMapper.toEntity(request,department);
         return studentMapper.toResponse(studentRepository.save(student));
@@ -38,6 +42,15 @@ public class StudentServiceImpl implements StudentService {
     public StudentResponse updateStudentInfo(String id, StudentRequest request) {
 
         Student enrolledStudent = studentRepository.findById(id).orElseThrow(()-> new NoSuchElementException("There is no student with id: "+id));
+
+        studentRepository.findByEmail(request.getEmail())
+                .ifPresent(student -> {
+                    if (!enrolledStudent.getId().equals(student.getId())) {
+                        throw new DuplicateRequestException(
+                                "Email already associated with other student: " + request.getEmail()
+                        );
+                    }
+                });
 
         Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> new NoSuchElementException("There is no department with id: "+request.getDepartmentId()));
 
@@ -63,7 +76,9 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<StudentResponse> getStudentsByDepartmentId(String departmentId) {
-        List<Student> students = studentRepository.getStudentByDepartmentId(departmentId);
+        List<Student> students = studentRepository.findByDepartmentId(departmentId);
+
+        System.out.println("Entered the method: 'getStudentsByDepartmentId'");
 
         return studentMapper.toResponseList(students);
     }
@@ -81,22 +96,23 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<StudentResponse> getStudentsByFirstName(String firstName) {
-        List<Student> students = studentRepository.findByFirstName(firstName);
+    public List<StudentResponse> searchStudents(String firstName, String lastName) {
 
-        return studentMapper.toResponseList(students);
-    }
+        List<Student> students;
 
-    @Override
-    public List<StudentResponse> getStudentsByLastName(String lastName) {
-        List<Student> students = studentRepository.findByLastName(lastName);
-
-        return studentMapper.toResponseList(students);
-    }
-
-    @Override
-    public List<StudentResponse> getAllStudents() {
-        List<Student> students = studentRepository.findAll();
+        if(firstName != null && lastName != null){
+            students = studentRepository
+                    .findByFirstNameAndLastName(firstName, lastName);
+        }
+        else if (firstName != null) {
+            students = studentRepository.findByFirstName(firstName);
+        }
+        else if(lastName != null){
+            students = studentRepository.findByLastName(lastName);
+        }
+        else {
+            students = studentRepository.findAll();
+        }
 
         return studentMapper.toResponseList(students);
     }

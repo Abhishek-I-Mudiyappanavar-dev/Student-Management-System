@@ -10,6 +10,6 @@ public interface DepartmentRepository extends JpaRepository<Department, String >
 
     Optional<Department> findByCode(String code);
 
-    List<Department> findByName(String name);
+    Optional<Department> findByName(String name);
 
 }

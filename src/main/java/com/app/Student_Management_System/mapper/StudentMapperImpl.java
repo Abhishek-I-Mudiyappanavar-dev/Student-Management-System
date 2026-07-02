@@ -13,8 +13,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentMapperImpl implements StudentMapper{
 
-    private final StudentMapper studentMapper;
-
     @Override
     public Student toEntity(StudentRequest request, Department department) {
 

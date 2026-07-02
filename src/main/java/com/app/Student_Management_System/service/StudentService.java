@@ -19,10 +19,6 @@ public interface StudentService {
 
     StudentResponse getStudentByEmail(String email);
 
-    List<StudentResponse> getStudentsByFirstName(String firstName);
-
-    List<StudentResponse> getStudentsByLastName(String lastName);
-
-    List<StudentResponse> getAllStudents();
+    List<StudentResponse> searchStudents(String firstName, String lastName);
 
 }
