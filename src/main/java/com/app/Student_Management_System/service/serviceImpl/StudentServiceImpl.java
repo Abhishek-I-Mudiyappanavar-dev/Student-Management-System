@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -77,8 +76,6 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<StudentResponse> getStudentsByDepartmentId(String departmentId) {
         List<Student> students = studentRepository.findByDepartmentId(departmentId);
-
-        System.out.println("Entered the method: 'getStudentsByDepartmentId'");
 
         return studentMapper.toResponseList(students);
     }
