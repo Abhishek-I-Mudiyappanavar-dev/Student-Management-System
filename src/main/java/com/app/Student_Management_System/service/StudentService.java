@@ -21,4 +21,6 @@ public interface StudentService {
 
     List<StudentResponse> searchStudents(String firstName, String lastName);
 
+    Integer getEarnedCredits(String id);
+
 }

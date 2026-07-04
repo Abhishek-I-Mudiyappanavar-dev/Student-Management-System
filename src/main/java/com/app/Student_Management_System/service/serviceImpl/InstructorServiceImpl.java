@@ -5,6 +5,9 @@ import com.app.Student_Management_System.dto.response.InstructorResponse;
 import com.app.Student_Management_System.entity.Department;
 import com.app.Student_Management_System.entity.Instructor;
 import com.app.Student_Management_System.enums.Designation;
+import com.app.Student_Management_System.exception.DepartmentNotFoundException;
+import com.app.Student_Management_System.exception.DuplicateEmailException;
+import com.app.Student_Management_System.exception.InstructorNotFoundException;
 import com.app.Student_Management_System.mapper.InstructorMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
 import com.app.Student_Management_System.repository.InstructorRepository;
@@ -33,14 +36,14 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     public List<InstructorResponse> getInstructorsByDepartmentId(String id) {
         if(departmentRepository.findById(id).isEmpty()){
-            throw new NoSuchElementException("There is no department with id: "+id);
+            throw new DepartmentNotFoundException("There is no department with id: "+id);
         }
         return instructorMapper.toResponseList(instructorRepository.findByDepartmentId(id));
     }
 
     @Override
     public InstructorResponse getInstructorById(String id) {
-        return instructorMapper.toResponse(instructorRepository.findById(id).orElseThrow(()-> new NoSuchElementException("There is no instructor with id: "+id)));
+        return instructorMapper.toResponse(instructorRepository.findById(id).orElseThrow(()-> new InstructorNotFoundException("There is no instructor with id: "+id)));
     }
 
     @Override
@@ -50,7 +53,7 @@ public class InstructorServiceImpl implements InstructorService {
 
     @Override
     public InstructorResponse getInstructorByEmail(String email) {
-        return instructorMapper.toResponse(instructorRepository.findByEmail(email).orElseThrow(()-> new NoSuchElementException("There is no instructor with email id: "+email)));
+        return instructorMapper.toResponse(instructorRepository.findByEmail(email).orElseThrow(()-> new InstructorNotFoundException("There is no instructor with email id: "+email)));
     }
 
     @Override
@@ -61,21 +64,21 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     public InstructorResponse createInstructor(InstructorRequest request) {
         if(instructorRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new UnsupportedOperationException("Email already associated with existing instructor: "+request.getEmail());
+            throw new DuplicateEmailException("Email already associated with existing instructor: "+request.getEmail());
         }
 
-        Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> new NoSuchElementException("No department found with id: "+request.getDepartmentId()));
+        Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> new DepartmentNotFoundException("No department found with id: "+request.getDepartmentId()));
         return instructorMapper.toResponse(instructorRepository.save(instructorMapper.toEntity(request, department)));//
     }
 
     @Override
     public InstructorResponse updateInstructor(String id, InstructorRequest request) {
-        Instructor existingInstructor = instructorRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No instructor found with id: " + id));
+        Instructor existingInstructor = instructorRepository.findById(id).orElseThrow(() -> new InstructorNotFoundException("No instructor found with id: " + id));
 
         instructorRepository.findByEmail(request.getEmail())
                 .ifPresent(student -> {
                     if (!existingInstructor.getId().equals(student.getId())) {
-                        throw new UnsupportedOperationException(
+                        throw new DuplicateEmailException(
                                 "Email already associated with other student: " + request.getEmail()
                         );
                     }
@@ -95,7 +98,7 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     public void deleteInstructorById(String id) {
 
-        Instructor instructor = instructorRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Instructor not found with id: "+id));
+        Instructor instructor = instructorRepository.findById(id).orElseThrow(()-> new InstructorNotFoundException("Instructor not found with id: "+id));
         instructorRepository.delete(instructor);
     }
 }

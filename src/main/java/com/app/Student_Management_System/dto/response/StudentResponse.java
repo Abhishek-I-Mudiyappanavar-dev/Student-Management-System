@@ -26,6 +26,8 @@ public class StudentResponse {
 
     private String phoneNumber;
 
+    private Integer earnedCredits;
+
     private LocalDate dateOfBirth;
 
     private String departmentId;

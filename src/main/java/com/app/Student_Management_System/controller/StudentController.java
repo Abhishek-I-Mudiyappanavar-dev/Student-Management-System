@@ -57,6 +57,11 @@ public class StudentController {
         );
     }
 
+    @GetMapping("/earnedCredits/{id}")
+    public ResponseEntity<Integer> getStudentsEarnedCredits(@PathVariable String studentId){
+        return ResponseEntity.ok(studentService.getEarnedCredits(studentId));
+    }
+
     @GetMapping("/department/{departmentId}")
     public ResponseEntity<List<StudentResponse>> getStudentsByDepartment(
             @PathVariable String departmentId) {

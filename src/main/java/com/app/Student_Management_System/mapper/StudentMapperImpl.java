@@ -40,6 +40,7 @@ public class StudentMapperImpl implements StudentMapper{
         response.setDateOfBirth(student.getDateOfBirth());
         response.setDepartmentId(student.getDepartment().getId());
         response.setDepartmentName(student.getDepartment().getName());
+        response.setEarnedCredits(student.getEarnedCredits());
         return response;
     }
 

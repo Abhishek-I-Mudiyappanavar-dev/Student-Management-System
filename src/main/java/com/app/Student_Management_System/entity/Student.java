@@ -40,6 +40,10 @@ public class Student {
     @Column
     private LocalDate dateOfBirth;
 
+    @Column
+    @Builder.Default
+    private Integer earnedCredits=0;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

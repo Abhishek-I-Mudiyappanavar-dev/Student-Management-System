@@ -4,16 +4,17 @@ import com.app.Student_Management_System.dto.request.StudentRequest;
 import com.app.Student_Management_System.dto.response.StudentResponse;
 import com.app.Student_Management_System.entity.Department;
 import com.app.Student_Management_System.entity.Student;
+import com.app.Student_Management_System.exception.DepartmentNotFoundException;
+import com.app.Student_Management_System.exception.DuplicateEmailException;
+import com.app.Student_Management_System.exception.StudentNotFoundException;
 import com.app.Student_Management_System.mapper.StudentMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
 import com.app.Student_Management_System.repository.StudentRepository;
 import com.app.Student_Management_System.service.StudentService;
-import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +31,9 @@ public class StudentServiceImpl implements StudentService {
     public StudentResponse admitStudent(StudentRequest request) {
 
         if(studentRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new DuplicateRequestException("Email already exists: "+request.getEmail());
+            throw new DuplicateEmailException("Email already exists: "+request.getEmail());
         }
-        Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> new NoSuchElementException("There is no department with id: "+request.getDepartmentId()));
+        Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> new DepartmentNotFoundException("There is no department with id: "+request.getDepartmentId()));
         Student student = studentMapper.toEntity(request,department);
         return studentMapper.toResponse(studentRepository.save(student));
     }
@@ -40,18 +41,18 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentResponse updateStudentInfo(String id, StudentRequest request) {
 
-        Student enrolledStudent = studentRepository.findById(id).orElseThrow(()-> new NoSuchElementException("There is no student with id: "+id));
+        Student enrolledStudent = studentRepository.findById(id).orElseThrow(()-> new StudentNotFoundException("There is no student with id: "+id));
 
         studentRepository.findByEmail(request.getEmail())
                 .ifPresent(student -> {
                     if (!enrolledStudent.getId().equals(student.getId())) {
-                        throw new DuplicateRequestException(
+                        throw new DuplicateEmailException(
                                 "Email already associated with other student: " + request.getEmail()
                         );
                     }
                 });
 
-        Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> new NoSuchElementException("There is no department with id: "+request.getDepartmentId()));
+        Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> new DepartmentNotFoundException("There is no department with id: "+request.getDepartmentId()));
 
         enrolledStudent.setFirstName(request.getFirstName());
         enrolledStudent.setLastName(request.getLastName());
@@ -69,7 +70,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void deleteStudentById(String id) {
 
-        Student student = studentRepository.findById(id).orElseThrow(()-> new NoSuchElementException("There is no student with id: "+id));
+        Student student = studentRepository.findById(id).orElseThrow(()-> new StudentNotFoundException("There is no student with id: "+id));
         studentRepository.delete(student);
     }
 
@@ -82,13 +83,13 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentResponse getStudentById(String id) {
-        Student student = studentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No student found with id: "+id));
+        Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException("No student found with id: "+id));
         return studentMapper.toResponse(student);
     }
 
     @Override
     public StudentResponse getStudentByEmail(String email) {
-        Student student = studentRepository.findByEmail(email).orElseThrow(()-> new NoSuchElementException("No student found with email: "+email));
+        Student student = studentRepository.findByEmail(email).orElseThrow(()-> new StudentNotFoundException("No student found with email: "+email));
         return studentMapper.toResponse(student);
     }
 
@@ -112,5 +113,11 @@ public class StudentServiceImpl implements StudentService {
         }
 
         return studentMapper.toResponseList(students);
+    }
+
+    @Override
+    public Integer getEarnedCredits(String id) {
+        Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException("No student found with id: "+id));
+        return student.getEarnedCredits();
     }
 }
