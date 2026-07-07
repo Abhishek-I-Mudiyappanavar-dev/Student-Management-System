@@ -1,6 +1,7 @@
 package com.app.Student_Management_System.controller;
 
 import com.app.Student_Management_System.dto.request.InstructorRequest;
+import com.app.Student_Management_System.dto.request.InstructorUpdateRequest;
 import com.app.Student_Management_System.dto.response.InstructorResponse;
 import com.app.Student_Management_System.enums.Designation;
 import com.app.Student_Management_System.service.InstructorService;
@@ -50,7 +51,7 @@ public class InstructorController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<InstructorResponse> updateInstructor(@Valid @RequestBody InstructorRequest request, @PathVariable String id){
+    public ResponseEntity<InstructorResponse> updateInstructor(@Valid @RequestBody InstructorUpdateRequest request, @PathVariable String id){
         return ResponseEntity.ok(instructorService.updateInstructor(id, request));
     }
 

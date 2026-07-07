@@ -1,6 +1,7 @@
 package com.app.Student_Management_System.controller;
 
 import com.app.Student_Management_System.dto.request.StudentRequest;
+import com.app.Student_Management_System.dto.request.StudentUpdateRequest;
 import com.app.Student_Management_System.dto.response.StudentResponse;
 import com.app.Student_Management_System.service.StudentService;
 import jakarta.validation.Valid;
@@ -74,7 +75,7 @@ public class StudentController {
     @PatchMapping("/{id}")
     public ResponseEntity<StudentResponse> updateStudent(
             @PathVariable String id,
-            @Valid @RequestBody StudentRequest request) {
+            @Valid @RequestBody StudentUpdateRequest request) {
 
         return ResponseEntity.ok(
                 studentService.updateStudentInfo(id, request)

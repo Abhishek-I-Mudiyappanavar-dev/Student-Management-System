@@ -1,6 +1,7 @@
 package com.app.Student_Management_System.service;
 
 import com.app.Student_Management_System.dto.request.InstructorRequest;
+import com.app.Student_Management_System.dto.request.InstructorUpdateRequest;
 import com.app.Student_Management_System.dto.response.InstructorResponse;
 import com.app.Student_Management_System.enums.Designation;
 
@@ -22,7 +23,7 @@ public interface InstructorService {
 
     InstructorResponse createInstructor(InstructorRequest request);
 
-    InstructorResponse updateInstructor(String id, InstructorRequest request);
+    InstructorResponse updateInstructor(String id, InstructorUpdateRequest request);
 
     void deleteInstructorById(String id);
 }
