@@ -46,6 +46,9 @@ public class DepartmentServiceImpl implements DepartmentService {
             logger.warn("No department found with id '{}'", id);
             return new NoSuchElementException("There is no department with id: "+id);
         });
+        if(!department.getName().equals(request.getName())){
+
+        }
         department.setName(request.getName());
         department.setCode(request.getCode());
         department.setDescription(request.getDescription());
@@ -97,6 +100,17 @@ public class DepartmentServiceImpl implements DepartmentService {
         });
         departmentRepository.delete(department);
         logger.info("Department deleted successfully with id '{}'", id);
+    }
+
+    @Override
+    public Boolean existsDepartmentByCode(String code) {
+
+        return null;
+    }
+
+    @Override
+    public Boolean existsDepartmentByName(String name) {
+        return null;
     }
 
 }
