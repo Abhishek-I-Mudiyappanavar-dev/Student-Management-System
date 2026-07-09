@@ -25,6 +25,8 @@ public class GlobalExceptionHandler {
             RuntimeException ex,
             HttpServletRequest request
     ) {
+
+
         return buildStandardErrorResponse(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage(),

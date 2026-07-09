@@ -28,9 +28,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentResponse createDepartment(DepartmentRequest request) {
         logger.info("Processing create department request with code '{}'", request.getCode());
-        if(departmentRepository.findByCode(request.getCode()).isPresent()){
+        if(departmentRepository.existsByCode(request.getCode())){
             logger.warn("Code already associated with other department '{}'", request.getCode());
             throw new DuplicateRequestException("Department already exists with code: "+request.getCode());
+        }
+        if(departmentRepository.existsByName(request.getName())){
+            logger.warn("Department already exists with name '{}'", request.getName());
+            throw new DuplicateRequestException("Department already exists with name "+request.getName());
         }
         Department department = departmentMapper.toEntity(request);
         department = departmentRepository.save(department);
@@ -46,8 +50,13 @@ public class DepartmentServiceImpl implements DepartmentService {
             logger.warn("No department found with id '{}'", id);
             return new NoSuchElementException("There is no department with id: "+id);
         });
-        if(!department.getName().equals(request.getName())){
-
+        if(departmentRepository.existsByCode(request.getCode())){
+            logger.warn("Code already associated with other department '{}'", request.getCode());
+            throw new DuplicateRequestException("Department already exists with code: "+request.getCode());
+        }
+        if(departmentRepository.existsByName(request.getName())){
+            logger.warn("Department already exists with name '{}'", request.getName());
+            throw new DuplicateRequestException("Department already exists with name "+request.getName());
         }
         department.setName(request.getName());
         department.setCode(request.getCode());
@@ -104,13 +113,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public Boolean existsDepartmentByCode(String code) {
-
-        return null;
+        return departmentRepository.existsByCode(code);
     }
 
     @Override
     public Boolean existsDepartmentByName(String name) {
-        return null;
+        return departmentRepository.existsByName(name);
     }
 
 }
