@@ -2,6 +2,8 @@ package com.app.Student_Management_System.exception;
 
 import com.app.Student_Management_System.dto.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,6 +17,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler({
             StudentNotFoundException.class,
@@ -77,18 +81,19 @@ public class GlobalExceptionHandler {
                 "Malformed or unreadable request body",request);
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ErrorResponse> handleGlobalException(
-//            Exception ex,
-//            HttpServletRequest request
-//    ) {
-//
-//        return buildStandardErrorResponse(
-//                HttpStatus.INTERNAL_SERVER_ERROR,
-//                "An unexpected error occurred",
-//                request
-//        );
-//    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        logger.error("Unhandled exception while processing {} {}", request.getMethod(), request.getRequestURI(),ex);
+
+        return buildStandardErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred",
+                request
+        );
+    }
 
     private ResponseEntity<ErrorResponse> buildStandardErrorResponse(
             HttpStatus status,
