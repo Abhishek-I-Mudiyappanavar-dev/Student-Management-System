@@ -2,8 +2,10 @@ package com.app.Student_Management_System.service;
 
 import com.app.Student_Management_System.dto.request.StudentRequest;
 import com.app.Student_Management_System.dto.request.StudentUpdateRequest;
+import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.dto.response.StudentResponse;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface StudentService {
@@ -20,7 +22,7 @@ public interface StudentService {
 
     StudentResponse getStudentByEmail(String email);
 
-    List<StudentResponse> searchStudents(String firstName, String lastName);
+    PageResponse<StudentResponse> searchStudents(String firstName, String lastName, Pageable pageable);
 
     Integer getEarnedCredits(String id);
 

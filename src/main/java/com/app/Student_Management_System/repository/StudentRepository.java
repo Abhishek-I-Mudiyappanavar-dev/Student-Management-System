@@ -1,18 +1,20 @@
 package com.app.Student_Management_System.repository;
 
 import com.app.Student_Management_System.entity.Student;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface StudentRepository extends JpaRepository<Student, String> {
 
-    List<Student> findByFirstNameAndLastName(String firstName, String lastName);
+    Page<Student> findByFirstNameAndLastName(String firstName, String lastName, Pageable pageable);
 
-    List<Student> findByFirstName(String firstName);
+    Page<Student> findByFirstName(String firstName, Pageable pageable);
 
-    List<Student> findByLastName(String lastName);
+    Page<Student> findByLastName(String lastName, Pageable pageable);
 
     Optional<Student> findByEmail(String email);
 

@@ -2,12 +2,14 @@ package com.app.Student_Management_System.service.serviceImpl;
 
 import com.app.Student_Management_System.dto.request.StudentRequest;
 import com.app.Student_Management_System.dto.request.StudentUpdateRequest;
+import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.dto.response.StudentResponse;
 import com.app.Student_Management_System.entity.Department;
 import com.app.Student_Management_System.entity.Student;
 import com.app.Student_Management_System.exception.DepartmentNotFoundException;
 import com.app.Student_Management_System.exception.DuplicateEmailException;
 import com.app.Student_Management_System.exception.StudentNotFoundException;
+import com.app.Student_Management_System.mapper.PageResponseMapper;
 import com.app.Student_Management_System.mapper.StudentMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
 import com.app.Student_Management_System.repository.StudentRepository;
@@ -15,11 +17,12 @@ import com.app.Student_Management_System.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -124,25 +127,26 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<StudentResponse> searchStudents(String firstName, String lastName) {
+    public PageResponse<StudentResponse> searchStudents(String firstName, String lastName, Pageable pageable) {
 
-        List<Student> students;
+        Page<Student> students;
 
         if(firstName != null && lastName != null){
             students = studentRepository
-                    .findByFirstNameAndLastName(firstName, lastName);
+                    .findByFirstNameAndLastName(firstName, lastName, pageable);
         }
         else if (firstName != null) {
-            students = studentRepository.findByFirstName(firstName);
+            students = studentRepository.findByFirstName(firstName, pageable);
         }
         else if(lastName != null){
-            students = studentRepository.findByLastName(lastName);
+            students = studentRepository.findByLastName(lastName, pageable);
         }
         else {
-            students = studentRepository.findAll();
+            students = studentRepository.findAll(pageable);
         }
+        List<StudentResponse> responses = studentMapper.toResponseList(students.getContent());
 
-        return studentMapper.toResponseList(students);
+        return PageResponseMapper.toPageResponse(students,responses);
     }
 
     @Override

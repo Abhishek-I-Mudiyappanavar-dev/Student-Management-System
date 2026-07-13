@@ -3,6 +3,7 @@ package com.app.Student_Management_System.controller;
 import com.app.Student_Management_System.dto.request.StudentRequest;
 import com.app.Student_Management_System.dto.request.StudentUpdateRequest;
 import com.app.Student_Management_System.dto.response.ErrorResponse;
+import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.dto.response.StudentResponse;
 import com.app.Student_Management_System.service.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -91,16 +95,17 @@ public class StudentController {
                     responseCode = "200",
                     description = "Students retrieved successfully",
                     content = @Content( array = @ArraySchema(
-                            schema = @Schema(implementation = StudentResponse.class)
+                            schema = @Schema(implementation = PageResponse.class)
                     ))
             )
     })
-    public ResponseEntity<List<StudentResponse>> searchStudents(
+    @PageableAsQueryParam
+    public ResponseEntity<PageResponse<StudentResponse>> searchStudents(
             @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName) {
+            @RequestParam(required = false) String lastName, @PageableDefault Pageable pageable) {
 
         return ResponseEntity.ok(
-                studentService.searchStudents(firstName, lastName)
+                studentService.searchStudents(firstName, lastName, pageable)
         );
     }
 
