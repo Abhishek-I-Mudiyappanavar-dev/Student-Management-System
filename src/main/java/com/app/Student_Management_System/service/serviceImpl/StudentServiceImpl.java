@@ -14,10 +14,12 @@ import com.app.Student_Management_System.mapper.StudentMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
 import com.app.Student_Management_System.repository.StudentRepository;
 import com.app.Student_Management_System.service.StudentService;
+import com.app.Student_Management_System.specification.StudentSpecification;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
@@ -103,12 +105,6 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<StudentResponse> getStudentsByDepartmentId(String departmentId) {
-        List<Student> students = studentRepository.findByDepartmentId(departmentId);
-        return studentMapper.toResponseList(students);
-    }
-
-    @Override
     public StudentResponse getStudentById(String id) {
         Student student = studentRepository.findById(id).orElseThrow(() ->{
             logger.warn("No student found with id '{}'", id);
@@ -127,23 +123,16 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public PageResponse<StudentResponse> searchStudents(String firstName, String lastName, Pageable pageable) {
+    public PageResponse<StudentResponse> searchStudents(String firstName, String lastName, String departmentId, Pageable pageable) {
 
         Page<Student> students;
 
-        if(firstName != null && lastName != null){
-            students = studentRepository
-                    .findByFirstNameAndLastName(firstName, lastName, pageable);
-        }
-        else if (firstName != null) {
-            students = studentRepository.findByFirstName(firstName, pageable);
-        }
-        else if(lastName != null){
-            students = studentRepository.findByLastName(lastName, pageable);
-        }
-        else {
-            students = studentRepository.findAll(pageable);
-        }
+        Specification<Student> specification = Specification.allOf(
+                StudentSpecification.hasFirstName(firstName),
+                StudentSpecification.hasLastName(lastName),
+                StudentSpecification.hasDepartmentId(departmentId));
+        students = studentRepository.findAll(specification, pageable);
+
         List<StudentResponse> responses = studentMapper.toResponseList(students.getContent());
 
         return PageResponseMapper.toPageResponse(students,responses);

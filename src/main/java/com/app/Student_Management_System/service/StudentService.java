@@ -16,13 +16,11 @@ public interface StudentService {
 
     void deleteStudentById(String id);
 
-    List<StudentResponse> getStudentsByDepartmentId(String departmentId);
-
     StudentResponse getStudentById(String id);
 
     StudentResponse getStudentByEmail(String email);
 
-    PageResponse<StudentResponse> searchStudents(String firstName, String lastName, Pageable pageable);
+    PageResponse<StudentResponse> searchStudents(String firstName, String lastName,String departmentId, Pageable pageable);
 
     Integer getEarnedCredits(String id);
 

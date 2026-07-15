@@ -102,10 +102,12 @@ public class StudentController {
     @PageableAsQueryParam
     public ResponseEntity<PageResponse<StudentResponse>> searchStudents(
             @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName, @PageableDefault Pageable pageable) {
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String departmentId,
+            @PageableDefault Pageable pageable) {
 
         return ResponseEntity.ok(
-                studentService.searchStudents(firstName, lastName, pageable)
+                studentService.searchStudents(firstName, lastName, departmentId , pageable)
         );
     }
 
@@ -199,30 +201,6 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getEarnedCredits(studentId));
     }
 
-    @GetMapping("/department/{departmentId}")
-    @Operation(
-            summary = "Get students by department",
-            description = """
-                Retrieves all students belonging to the specified department.
-                Returns an empty list if the department has no enrolled students.
-                """
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Students retrieved successfully",
-                    content = @Content(
-                            schema = @Schema(implementation = StudentResponse.class)
-                    )
-            )
-    })
-    public ResponseEntity<List<StudentResponse>> getStudentsByDepartment(
-            @PathVariable String departmentId) {
-
-        return ResponseEntity.ok(
-                studentService.getStudentsByDepartmentId(departmentId)
-        );
-    }
 
     @PatchMapping("/{studentId}")
     @Operation(
