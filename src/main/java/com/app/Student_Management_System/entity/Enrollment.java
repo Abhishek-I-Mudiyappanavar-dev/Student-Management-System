@@ -41,6 +41,13 @@ public class Enrollment {
     @Column(nullable = false)
     private LocalDate enrollmentDate;
 
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;

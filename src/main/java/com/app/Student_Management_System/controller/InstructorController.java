@@ -3,11 +3,15 @@ package com.app.Student_Management_System.controller;
 import com.app.Student_Management_System.dto.request.InstructorRequest;
 import com.app.Student_Management_System.dto.request.InstructorUpdateRequest;
 import com.app.Student_Management_System.dto.response.InstructorResponse;
+import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.enums.Designation;
 import com.app.Student_Management_System.service.InstructorService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +23,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/instructors")
 @RequiredArgsConstructor
@@ -29,30 +31,6 @@ description = "Operations for managing instructor records")
 public class InstructorController {
 
     private final InstructorService instructorService;
-
-    @GetMapping
-    @Operation(
-            summary = "Get all instructors",
-            description = """
-                Returns all instructors registered in the system.
-                Returns an empty list if no instructors are available.
-                """
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Instructors returned successfully",
-                    content = @Content(
-                            array = @ArraySchema(
-                                    schema = @Schema(implementation = InstructorResponse.class)
-                            )
-                    )
-            )
-    })
-    public ResponseEntity<List<InstructorResponse>> getAllInstructors(){
-
-        return ResponseEntity.ok(instructorService.getAllInstructors());
-    }
 
     @GetMapping("/{instructorId}")
     @Operation(
@@ -82,52 +60,36 @@ public class InstructorController {
         return ResponseEntity.ok(instructorService.getInstructorById(instructorId));
     }
 
-    @GetMapping("/name")
+    @GetMapping
     @Operation(
-            summary = "Get instructors by name",
+            summary = "Search instructors",
             description = """
-                Returns all instructors whose name matches the specified value.
-                Returns an empty list if no matching instructors are found.
+                Retrieves instructors matching the provided search criteria.
+                If name is supplied, instructors matching name are returned.
+                If designation is provided, instructors matching designation are returned.
+                If departmentId is provided, instructors associated with specific department are returned.
+                If only one parameter is provided, instructors are filtered accordingly.
+                If no parameters are provided, all instructors are returned.
                 """
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "Instructors returned successfully",
-                    content = @Content(
-                            array = @ArraySchema(
-                                    schema = @Schema(implementation = InstructorResponse.class)
-                            )
-                    )
+                    description = "Instructors retrieved successfully",
+                    content = @Content( array = @ArraySchema(
+                            schema = @Schema(implementation = PageResponse.class)
+                    ))
             )
     })
-    public ResponseEntity<List<InstructorResponse>> getInstructorsByName(@RequestParam String name){
-
-        return ResponseEntity.ok(instructorService.getInstructorsByName(name));
-    }
-
-    @GetMapping("/designation")
-    @Operation(
-            summary = "Get instructors by designation",
-            description = """
-                Returns all instructors having the specified designation.
-                Returns an empty list if no instructors match the designation.
-                """
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Instructors returned successfully",
-                    content = @Content(
-                            array = @ArraySchema(
-                                    schema = @Schema(implementation = InstructorResponse.class)
-                            )
-                    )
-            )
-    })
-    public ResponseEntity<List<InstructorResponse>> getInstructorsByDesignation(@RequestParam Designation designation){
-
-        return ResponseEntity.ok(instructorService.getInstructorByDesignation(designation));
+    @PageableAsQueryParam
+    public ResponseEntity<PageResponse<InstructorResponse>> searchInstructors(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String departmentId,
+            @RequestParam(required = false) Designation designation ,
+            @PageableDefault Pageable pageable){
+        return ResponseEntity.ok(instructorService.searchInstructors(
+                name, departmentId, designation, pageable
+        ));
     }
 
     @GetMapping("/email")
@@ -197,9 +159,9 @@ public class InstructorController {
                     )
             )
     })
-    public ResponseEntity<InstructorResponse> createInstructor(@Valid @RequestBody InstructorRequest request){
+    public ResponseEntity<InstructorResponse> appointInstructor(@Valid @RequestBody InstructorRequest request){
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(instructorService.createInstructor(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(instructorService.appointInstructor(request));
     }
 
     @PatchMapping("/{instructorId}")
@@ -244,37 +206,6 @@ public class InstructorController {
     public ResponseEntity<InstructorResponse> updateInstructor(@Valid @RequestBody InstructorUpdateRequest request, @PathVariable String instructorId){
 
         return ResponseEntity.ok(instructorService.updateInstructor(instructorId, request));
-    }
-
-    @GetMapping("/department/{departmentId}")
-    @Operation(
-            summary = "Get instructors by department",
-            description = """
-                Returns all instructors belonging to the specified department.
-                Returns an empty list if the department exists but has no instructors.
-                """
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Instructors returned successfully",
-                    content = @Content(
-                            array = @ArraySchema(
-                                    schema = @Schema(implementation = InstructorResponse.class)
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Department not found",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponse.class)
-                    )
-            )
-    })
-    public ResponseEntity<List<InstructorResponse>> getInstructorsByDepartment(@PathVariable String departmentId){
-
-        return ResponseEntity.ok(instructorService.getInstructorsByDepartmentId(departmentId));
     }
 
     @DeleteMapping("/{instructorId}")

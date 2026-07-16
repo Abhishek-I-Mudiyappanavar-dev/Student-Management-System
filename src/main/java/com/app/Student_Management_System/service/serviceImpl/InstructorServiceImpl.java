@@ -3,6 +3,7 @@ package com.app.Student_Management_System.service.serviceImpl;
 import com.app.Student_Management_System.dto.request.InstructorRequest;
 import com.app.Student_Management_System.dto.request.InstructorUpdateRequest;
 import com.app.Student_Management_System.dto.response.InstructorResponse;
+import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.entity.Department;
 import com.app.Student_Management_System.entity.Instructor;
 import com.app.Student_Management_System.enums.Designation;
@@ -10,13 +11,17 @@ import com.app.Student_Management_System.exception.DepartmentNotFoundException;
 import com.app.Student_Management_System.exception.DuplicateEmailException;
 import com.app.Student_Management_System.exception.InstructorNotFoundException;
 import com.app.Student_Management_System.mapper.InstructorMapper;
+import com.app.Student_Management_System.mapper.PageResponseMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
 import com.app.Student_Management_System.repository.InstructorRepository;
 import com.app.Student_Management_System.service.InstructorService;
-import jakarta.validation.constraints.NotBlank;
+import com.app.Student_Management_System.specification.InstructorSpecification;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,17 +40,21 @@ public class InstructorServiceImpl implements InstructorService {
     private static final Logger logger = LoggerFactory.getLogger(InstructorServiceImpl.class);
 
     @Override
-    public List<InstructorResponse> getAllInstructors() {
-        return instructorMapper.toResponseList(instructorRepository.findAll());
-    }
+    public PageResponse<InstructorResponse> searchInstructors(String name, String departmentId, Designation designation, Pageable pageable) {
 
-    @Override
-    public List<InstructorResponse> getInstructorsByDepartmentId(String id) {
-        if(departmentRepository.findById(id).isEmpty()){
-            logger.warn("No department found with id '{}'", id);
-            throw new DepartmentNotFoundException("There is no department with id: "+id);
-        }
-        return instructorMapper.toResponseList(instructorRepository.findByDepartmentId(id));
+        Page<Instructor> instructors;
+
+        Specification<Instructor> specification = Specification.allOf(
+                InstructorSpecification.hasName(name),
+                InstructorSpecification.hasDepartmentId(departmentId),
+                InstructorSpecification.hasDesignation(designation)
+        );
+
+        instructors = instructorRepository.findAll(specification, pageable);
+
+        List<InstructorResponse> responses = instructorMapper.toResponseList(instructors.getContent());
+
+        return PageResponseMapper.toPageResponse(instructors, responses);
     }
 
     @Override
@@ -57,11 +66,6 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public List<InstructorResponse> getInstructorsByName(String name) {
-        return instructorMapper.toResponseList(instructorRepository.findByName(name));
-    }
-
-    @Override
     public InstructorResponse getInstructorByEmail(String email) {
         return instructorMapper.toResponse(instructorRepository.findByEmail(email).orElseThrow(()-> {
             logger.warn("No Instructor found with email '{}'", email);
@@ -70,12 +74,7 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public List<InstructorResponse> getInstructorByDesignation(Designation designation) {
-        return instructorMapper.toResponseList(instructorRepository.findByDesignation(designation));
-    }
-
-    @Override
-    public InstructorResponse createInstructor(InstructorRequest request) {
+    public InstructorResponse appointInstructor(InstructorRequest request) {
         logger.info("Processing create Instructor request for email '{}'", request.getEmail());
         if(instructorRepository.findByEmail(request.getEmail()).isPresent()){
             logger.warn("Email already associated with existing instructor '{}'", request.getEmail());

@@ -2,14 +2,18 @@ package com.app.Student_Management_System.service.serviceImpl;
 
 import com.app.Student_Management_System.dto.request.DepartmentRequest;
 import com.app.Student_Management_System.dto.response.DepartmentResponse;
+import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.entity.Department;
 import com.app.Student_Management_System.mapper.DepartmentMapper;
+import com.app.Student_Management_System.mapper.PageResponseMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
 import com.app.Student_Management_System.service.DepartmentService;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +26,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentRepository departmentRepository;
 
     private final DepartmentMapper departmentMapper;
+
 
     private static final Logger logger = LoggerFactory.getLogger(DepartmentServiceImpl.class);
 
@@ -69,10 +74,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public List<DepartmentResponse> getAllDepartments() {
+    public PageResponse<DepartmentResponse> getAllDepartments(Pageable pageable) {
 
-        List<Department> departments = departmentRepository.findAll();
-        return departmentMapper.toResponseList(departments);
+        Page<Department> departments = departmentRepository.findAll(pageable);
+        List<DepartmentResponse> responses = departmentMapper.toResponseList(departments.getContent());
+        return PageResponseMapper.toPageResponse(departments, responses);
     }
 
     @Override
@@ -111,14 +117,5 @@ public class DepartmentServiceImpl implements DepartmentService {
         logger.info("Department deleted successfully with id '{}'", id);
     }
 
-    @Override
-    public Boolean existsDepartmentByCode(String code) {
-        return departmentRepository.existsByCode(code);
-    }
-
-    @Override
-    public Boolean existsDepartmentByName(String name) {
-        return departmentRepository.existsByName(name);
-    }
 
 }

@@ -2,10 +2,14 @@ package com.app.Student_Management_System.controller;
 
 import com.app.Student_Management_System.dto.request.DepartmentRequest;
 import com.app.Student_Management_System.dto.response.DepartmentResponse;
+import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.service.DepartmentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -90,10 +94,11 @@ public class DepartmentController {
                     )
             )
     })
-    public ResponseEntity<List<DepartmentResponse>> getAllDepartments() {
+    @PageableAsQueryParam
+    public ResponseEntity<PageResponse<DepartmentResponse>> getAllDepartments(@PageableDefault Pageable pageable) {
 
         return ResponseEntity.ok(
-                departmentService.getAllDepartments()
+                departmentService.getAllDepartments(pageable)
         );
     }
 

@@ -22,8 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/students")
 @RequiredArgsConstructor
@@ -196,9 +194,9 @@ public class StudentController {
                     )
             )
     })
-    public ResponseEntity<Integer> getStudentsEarnedCredits(@PathVariable String studentId){
+    public ResponseEntity<Integer> getStudentEarnedCredits(@PathVariable String studentId){
 
-        return ResponseEntity.ok(studentService.getEarnedCredits(studentId));
+        return ResponseEntity.ok(studentService.getStudentEarnedCredits(studentId));
     }
 
 
@@ -246,7 +244,7 @@ public class StudentController {
             @Valid @RequestBody StudentUpdateRequest request) {
 
         return ResponseEntity.ok(
-                studentService.updateStudentInfo(studentId, request)
+                studentService.updateStudent(studentId, request)
         );
     }
 
@@ -273,7 +271,7 @@ public class StudentController {
     public ResponseEntity<Void> deleteStudent(
             @PathVariable String studentId) {
 
-        studentService.deleteStudentById(studentId);
+        studentService.deleteStudent(studentId);
 
         return ResponseEntity.noContent().build();
     }

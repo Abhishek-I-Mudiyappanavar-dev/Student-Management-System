@@ -61,7 +61,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public StudentResponse updateStudentInfo(String id, StudentUpdateRequest request){
+    public StudentResponse updateStudent(String id, StudentUpdateRequest request){
         logger.info("Processing update request for student with id '{}'",id);
 
         Student enrolledStudent = studentRepository.findById(id).orElseThrow(()-> {
@@ -92,7 +92,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public void deleteStudentById(String id) {
+    public void deleteStudent(String id) {
 
         logger.info("Processing delete request for student with id '{}'", id);
 
@@ -139,7 +139,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Integer getEarnedCredits(String id) {
+    public Integer getStudentEarnedCredits(String id) {
         Student student = studentRepository.findById(id).orElseThrow(() -> {
             logger.warn("No student found with id '{}'", id);
             return new StudentNotFoundException("No student found with id: "+id);
