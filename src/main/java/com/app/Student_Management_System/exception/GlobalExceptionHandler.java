@@ -20,11 +20,7 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({
-            StudentNotFoundException.class,
-            InstructorNotFoundException.class,
-            DepartmentNotFoundException.class
-    })
+    @ExceptionHandler({ResourceNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleNotFoundException(
             RuntimeException ex,
             HttpServletRequest request

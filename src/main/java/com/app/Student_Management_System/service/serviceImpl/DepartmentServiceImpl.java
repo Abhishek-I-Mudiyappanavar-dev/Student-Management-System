@@ -4,6 +4,7 @@ import com.app.Student_Management_System.dto.request.DepartmentRequest;
 import com.app.Student_Management_System.dto.response.DepartmentResponse;
 import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.entity.Department;
+import com.app.Student_Management_System.exception.ResourceNotFoundException;
 import com.app.Student_Management_System.mapper.DepartmentMapper;
 import com.app.Student_Management_System.mapper.PageResponseMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
@@ -37,10 +38,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             logger.warn("Code already associated with other department '{}'", request.getCode());
             throw new DuplicateRequestException("Department already exists with code: "+request.getCode());
         }
-        if(departmentRepository.existsByName(request.getName())){
-            logger.warn("Department already exists with name '{}'", request.getName());
-            throw new DuplicateRequestException("Department already exists with name "+request.getName());
-        }
+
         Department department = departmentMapper.toEntity(request);
         department = departmentRepository.save(department);
         DepartmentResponse response = departmentMapper.toResponse(department);
@@ -51,10 +49,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentResponse updateDepartment(String id, DepartmentRequest request) {
         logger.info("Processing update request for department with id '{}'", id);
-        Department department = departmentRepository.findById(id).orElseThrow(()-> {
-            logger.warn("No department found with id '{}'", id);
-            return new NoSuchElementException("There is no department with id: "+id);
-        });
+        Department department = getDepartmentOrThrow(id);
         if(departmentRepository.existsByCode(request.getCode())){
             logger.warn("Code already associated with other department '{}'", request.getCode());
             throw new DuplicateRequestException("Department already exists with code: "+request.getCode());
@@ -83,19 +78,14 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentResponse getDepartmentById(String id) {
-        return departmentMapper.toResponse(departmentRepository.findById(id).orElseThrow(()-> {
-            logger.warn("No department found with id '{}'", id);
-            return new NoSuchElementException("There is no department with id: "+id);
-        }));
+        return departmentMapper.toResponse(getDepartmentOrThrow(id));
     }
 
     @Override
-    public DepartmentResponse getDepartmentByName(String name) {
-        Department department = departmentRepository.findByName(name).orElseThrow(()-> {
-            logger.warn("No department found with name '{}'", name);
-            return new NoSuchElementException("There is no department with name: "+name);
-        });
-        return departmentMapper.toResponse(department);
+    public PageResponse<DepartmentResponse> getDepartmentByName(String name, Pageable pageable) {
+        Page<Department> departments = departmentRepository.findByName(name);
+        List<DepartmentResponse> responses = departmentMapper.toResponseList(departments.getContent());
+        return PageResponseMapper.toPageResponse(departments, responses);
     }
 
     @Override
@@ -109,12 +99,16 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public void deleteDepartmentById(String id) {
         logger.info("Processing delete department with id '{}'", id);
-        Department department = departmentRepository.findById(id).orElseThrow(()-> {
-            logger.warn("No department found with id '{}'", id);
-            return new NoSuchElementException("There is no department with id: "+id);
-        });
+        Department department = getDepartmentOrThrow(id);
         departmentRepository.delete(department);
         logger.info("Department deleted successfully with id '{}'", id);
+    }
+
+    private Department getDepartmentOrThrow(String departmentId){
+        return departmentRepository.findById(departmentId).orElseThrow(()->{
+            logger.warn("Department Not found with id '{}'", departmentId);
+            return new ResourceNotFoundException("Department Not found with id: "+departmentId);
+        });
     }
 
 

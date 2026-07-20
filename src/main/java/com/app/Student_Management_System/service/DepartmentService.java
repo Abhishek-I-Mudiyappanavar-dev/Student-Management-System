@@ -17,7 +17,7 @@ public interface DepartmentService {
 
     DepartmentResponse getDepartmentById(String id);
 
-    DepartmentResponse getDepartmentByName(String name);
+    PageResponse<DepartmentResponse> getDepartmentByName(String name, Pageable pageable);
 
     DepartmentResponse getDepartmentByCode(String code);
 

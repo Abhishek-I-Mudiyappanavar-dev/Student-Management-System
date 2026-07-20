@@ -6,9 +6,8 @@ import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.dto.response.StudentResponse;
 import com.app.Student_Management_System.entity.Department;
 import com.app.Student_Management_System.entity.Student;
-import com.app.Student_Management_System.exception.DepartmentNotFoundException;
 import com.app.Student_Management_System.exception.DuplicateEmailException;
-import com.app.Student_Management_System.exception.StudentNotFoundException;
+import com.app.Student_Management_System.exception.ResourceNotFoundException;
 import com.app.Student_Management_System.mapper.PageResponseMapper;
 import com.app.Student_Management_System.mapper.StudentMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
@@ -51,7 +50,7 @@ public class StudentServiceImpl implements StudentService {
 
         Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> {
             logger.warn("Student admission rejected: no department with id:'{}'", request.getDepartmentId());
-            return new DepartmentNotFoundException("No department found with id: "+request.getDepartmentId());
+            return new ResourceNotFoundException("No department found with id: "+request.getDepartmentId());
         });
 
         Student student = studentMapper.toEntity(request,department);
@@ -64,10 +63,7 @@ public class StudentServiceImpl implements StudentService {
     public StudentResponse updateStudent(String id, StudentUpdateRequest request){
         logger.info("Processing update request for student with id '{}'",id);
 
-        Student enrolledStudent = studentRepository.findById(id).orElseThrow(()-> {
-            logger.warn("No student found with id '{}'", id);
-            return new StudentNotFoundException("There is no student with id: "+id);
-        });
+        Student enrolledStudent = getStudentOrThrow(id);
 
         if(request.getEmail()!=null && !Objects.equals(enrolledStudent.getEmail(), request.getEmail())){
             studentRepository.findByEmail(request.getEmail())
@@ -96,20 +92,14 @@ public class StudentServiceImpl implements StudentService {
 
         logger.info("Processing delete request for student with id '{}'", id);
 
-        Student student = studentRepository.findById(id).orElseThrow(()->{
-            logger.warn("No student found with id '{}'", id);
-            return new StudentNotFoundException("There is no student with id: "+id);
-        });
+        Student student = getStudentOrThrow(id);
         studentRepository.delete(student);
         logger.info("Student deleted successfully with id '{}'",id);
     }
 
     @Override
     public StudentResponse getStudentById(String id) {
-        Student student = studentRepository.findById(id).orElseThrow(() ->{
-            logger.warn("No student found with id '{}'", id);
-            return new StudentNotFoundException("No student found with id: "+id);
-        });
+        Student student = getStudentOrThrow(id);
         return studentMapper.toResponse(student);
     }
 
@@ -117,7 +107,7 @@ public class StudentServiceImpl implements StudentService {
     public StudentResponse getStudentByEmail(String email) {
         Student student = studentRepository.findByEmail(email).orElseThrow(()-> {
             logger.warn("No student found with email '{}'",email);
-            return new StudentNotFoundException("No student found with email: "+email);
+            return new ResourceNotFoundException("No student found with email: "+email);
         });
         return studentMapper.toResponse(student);
     }
@@ -139,11 +129,15 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Integer getStudentEarnedCredits(String id) {
-        Student student = studentRepository.findById(id).orElseThrow(() -> {
-            logger.warn("No student found with id '{}'", id);
-            return new StudentNotFoundException("No student found with id: "+id);
-        });
+    public Integer getStudentEarnedCredits(String studentId) {
+        Student student = getStudentOrThrow(studentId);
         return student.getEarnedCredits();
+    }
+
+    private Student getStudentOrThrow(String studentId){
+        return studentRepository.findById(studentId).orElseThrow(()->{
+            logger.warn("Student Not found with id '{}'", studentId);
+            return new ResourceNotFoundException("Student Not found with id: "+studentId);
+        });
     }
 }

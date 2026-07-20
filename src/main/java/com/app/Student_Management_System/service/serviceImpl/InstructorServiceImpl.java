@@ -7,9 +7,8 @@ import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.entity.Department;
 import com.app.Student_Management_System.entity.Instructor;
 import com.app.Student_Management_System.enums.Designation;
-import com.app.Student_Management_System.exception.DepartmentNotFoundException;
 import com.app.Student_Management_System.exception.DuplicateEmailException;
-import com.app.Student_Management_System.exception.InstructorNotFoundException;
+import com.app.Student_Management_System.exception.ResourceNotFoundException;
 import com.app.Student_Management_System.mapper.InstructorMapper;
 import com.app.Student_Management_System.mapper.PageResponseMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
@@ -59,17 +58,14 @@ public class InstructorServiceImpl implements InstructorService {
 
     @Override
     public InstructorResponse getInstructorById(String id) {
-        return instructorMapper.toResponse(instructorRepository.findById(id).orElseThrow(()->{
-            logger.warn("No Instructor found with id '{}'", id);
-            return new InstructorNotFoundException("There is no instructor with id: "+id);
-        }));
+        return instructorMapper.toResponse(getInstructorOrThrow(id));
     }
 
     @Override
     public InstructorResponse getInstructorByEmail(String email) {
         return instructorMapper.toResponse(instructorRepository.findByEmail(email).orElseThrow(()-> {
             logger.warn("No Instructor found with email '{}'", email);
-            return new InstructorNotFoundException("There is no instructor with email id: "+email);
+            return new ResourceNotFoundException("There is no instructor with email id: "+email);
         }));
     }
 
@@ -83,7 +79,7 @@ public class InstructorServiceImpl implements InstructorService {
 
         Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(()-> {
             logger.warn("No department found with id '{}'", request.getDepartmentId());
-            return new DepartmentNotFoundException("No department found with id: "+request.getDepartmentId());
+            return new ResourceNotFoundException("No department found with id: "+request.getDepartmentId());
         });
         InstructorResponse response = instructorMapper.toResponse(instructorRepository.save(instructorMapper.toEntity(request, department)));//
         logger.info("Instructor created successfully with id '{}' and email '{}'", response.getId(), request.getEmail());
@@ -94,10 +90,7 @@ public class InstructorServiceImpl implements InstructorService {
     public InstructorResponse updateInstructor(String id, InstructorUpdateRequest request){
         logger.info("Processing update request for instructor with id '{}'", id);
 
-        Instructor existingInstructor = instructorRepository.findById(id).orElseThrow(()->{
-            logger.warn("No Instructor found with id '{}'", id);
-            return new InstructorNotFoundException("No Instructor found with id "+id);
-        });
+        Instructor existingInstructor = getInstructorOrThrow(id);
 
         if(request.getEmail()!=null && !Objects.equals(request.getEmail(), existingInstructor.getEmail())){
             instructorRepository.findByEmail(request.getEmail())
@@ -128,11 +121,15 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     public void deleteInstructorById(String id) {
         logger.info("Processing delete request by instructor with id '{}'", id);
-        Instructor instructor = instructorRepository.findById(id).orElseThrow(()-> {
-            logger.warn("No Instructor found with id '{}'", id);
-            return new InstructorNotFoundException("Instructor not found with id: "+id);
-        });
+        Instructor instructor = getInstructorOrThrow(id);
         instructorRepository.delete(instructor);
         logger.info("Instructor deleted successfully with id '{}'", id);
+    }
+
+    private Instructor getInstructorOrThrow(String instructorId){
+        return instructorRepository.findById(instructorId).orElseThrow(()->{
+            logger.warn("Instructor Not found with id '{}'", instructorId);
+            return new ResourceNotFoundException("Instructor Not found with id "+instructorId);
+        });
     }
 }

@@ -15,7 +15,8 @@ public final class StudentSpecification {
             return Specification.unrestricted();
         }
         return ((root, query, criteriaBuilder) ->
-            criteriaBuilder.equal(root.get("firstName"), firstName)
+            criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")),
+                    "%"+firstName.toLowerCase()+"%")
         );
     }
 
@@ -23,7 +24,8 @@ public final class StudentSpecification {
         if(lastName==null || lastName.isBlank()) return Specification.unrestricted();
 
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("lastName"), lastName)
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")),
+                        "%"+lastName.toLowerCase()+"%")
         );
     }
 
@@ -31,6 +33,6 @@ public final class StudentSpecification {
         if(departmentId==null || departmentId.isBlank()) return Specification.unrestricted();
 
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("department").get("id"), departmentId));
+                criteriaBuilder.equal(root.join("department").get("id"), departmentId));
     }
 }

@@ -156,11 +156,12 @@ public class DepartmentController {
                     )
             )
     })
-    public ResponseEntity<DepartmentResponse> getDepartmentByName(
-            @RequestParam String name) {
+    @PageableAsQueryParam
+    public ResponseEntity<PageResponse<DepartmentResponse>> getDepartmentByName(
+            @RequestParam String name, @PageableDefault Pageable pageable) {
 
         return ResponseEntity.ok(
-                departmentService.getDepartmentByName(name)
+                departmentService.getDepartmentByName(name, pageable)
         );
     }
 
