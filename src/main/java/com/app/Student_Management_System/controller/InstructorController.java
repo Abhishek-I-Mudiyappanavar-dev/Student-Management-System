@@ -64,13 +64,10 @@ public class InstructorController {
     @Operation(
             summary = "Search instructors",
             description = """
-                Retrieves instructors matching the provided search criteria.
-                If name is supplied, instructors matching name are returned.
-                If designation is provided, instructors matching designation are returned.
-                If departmentId is provided, instructors associated with specific department are returned.
-                If only one parameter is provided, instructors are filtered accordingly.
-                If no parameters are provided, all instructors are returned.
-                """
+                    Retrieves instructors matching the supplied filters.
+                    If multiple filters are provided, only instructors satisfying all criteria are returned.
+                    If no filters are provided, all instructors are returned.
+                    """
     )
     @ApiResponses({
             @ApiResponse(

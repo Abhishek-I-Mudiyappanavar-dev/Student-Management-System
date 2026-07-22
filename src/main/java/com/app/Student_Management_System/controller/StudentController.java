@@ -82,11 +82,10 @@ public class StudentController {
     @Operation(
             summary = "Search students",
             description = """
-                Retrieves students matching the provided search criteria.
-                If both first name and last name are supplied, students matching both are returned.
-                If only one parameter is provided, students are filtered accordingly.
-                If no parameters are provided, all students are returned.
-                """
+                    Retrieves students matching the supplied filters.
+                    If multiple filters are provided, only students satisfying all criteria are returned.
+                    If no filters are provided, all students are returned.
+                    """
     )
     @ApiResponses({
             @ApiResponse(

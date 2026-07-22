@@ -39,6 +39,7 @@ public class Enrollment {
     private EnrollmentStatus status;
 
     @Column(nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDate enrollmentDate;
 
     @CreationTimestamp
