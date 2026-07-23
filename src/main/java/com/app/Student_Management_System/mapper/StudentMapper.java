@@ -39,6 +39,7 @@ public class StudentMapper{
         response.setDepartmentId(student.getDepartment().getId());
         response.setDepartmentName(student.getDepartment().getName());
         response.setEarnedCredits(student.getEarnedCredits());
+        response.setProfilePicturePath(student.getProfilePicturePath());
         return response;
     }
 

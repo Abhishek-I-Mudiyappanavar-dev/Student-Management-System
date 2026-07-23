@@ -83,7 +83,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public PageResponse<DepartmentResponse> getDepartmentByName(String name, Pageable pageable) {
-        Page<Department> departments = departmentRepository.findByName(name);
+        Page<Department> departments = departmentRepository.findByName(name, pageable);
         List<DepartmentResponse> responses = departmentMapper.toResponseList(departments.getContent());
         return PageResponseMapper.toPageResponse(departments, responses);
     }

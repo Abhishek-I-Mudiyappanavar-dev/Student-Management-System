@@ -12,6 +12,7 @@ import com.app.Student_Management_System.mapper.PageResponseMapper;
 import com.app.Student_Management_System.mapper.StudentMapper;
 import com.app.Student_Management_System.repository.DepartmentRepository;
 import com.app.Student_Management_System.repository.StudentRepository;
+import com.app.Student_Management_System.service.FileStorageService;
 import com.app.Student_Management_System.service.StudentService;
 import com.app.Student_Management_System.specification.StudentSpecification;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +37,8 @@ public class StudentServiceImpl implements StudentService {
     private final DepartmentRepository departmentRepository;
 
     private final StudentMapper studentMapper;
+
+    private final FileStorageService fileStorageService;
 
     private static final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
 
@@ -132,6 +137,25 @@ public class StudentServiceImpl implements StudentService {
     public Integer getStudentEarnedCredits(String studentId) {
         Student student = getStudentOrThrow(studentId);
         return student.getEarnedCredits();
+    }
+
+    @Override
+    public StudentResponse uploadProfilePicture(String studentId, MultipartFile file) {
+
+        logger.info("Processing profile picture upload request for student with Id: '{}'", studentId);
+
+        Student student = getStudentOrThrow(studentId);
+        String profilePicturePath = fileStorageService.store(file, "students");
+        student.setProfilePicturePath(profilePicturePath);
+        student = studentRepository.save(student);
+
+        logger.info(
+                "Profile picture uploaded successfully for student '{}' with path '{}'",
+                studentId,
+                profilePicturePath
+        );
+
+        return studentMapper.toResponse(student);
     }
 
     private Student getStudentOrThrow(String studentId){

@@ -30,6 +30,8 @@ public class StudentResponse {
 
     private LocalDate dateOfBirth;
 
+    private String profilePicturePath;
+
     private String departmentId;
 
     private String departmentName;

@@ -44,6 +44,9 @@ public class Student {
     @Builder.Default
     private Integer earnedCredits=0;
 
+    @Column(name = "profile_picture_path")
+    private String profilePicturePath;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

@@ -6,6 +6,7 @@ import com.app.Student_Management_System.dto.response.PageResponse;
 import com.app.Student_Management_System.dto.response.StudentResponse;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface StudentService {
 
@@ -22,5 +23,7 @@ public interface StudentService {
     PageResponse<StudentResponse> searchStudents(String firstName, String lastName,String departmentId, Pageable pageable);
 
     Integer getStudentEarnedCredits(String id);
+
+    StudentResponse uploadProfilePicture(String  studentId, MultipartFile file);
 
 }

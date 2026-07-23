@@ -19,8 +19,10 @@ import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/students")
@@ -246,6 +248,43 @@ public class StudentController {
                 studentService.updateStudent(studentId, request)
         );
     }
+
+
+    @PostMapping(value = "/{studentId}/profile-picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Update student profile picture",
+            description = """
+                Updates the profile picture of the student identified by the specified ID.
+                Accepts an image file as multipart/form-data and replaces the existing profile picture.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Profile picture updated successfully",
+                    content = @Content(
+                            schema = @Schema(implementation = StudentResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid image file or request",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Student not found",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
+    })
+    public ResponseEntity<StudentResponse> updateProfilePictureById(@PathVariable String studentId, @RequestParam("file")MultipartFile file){
+        return ResponseEntity.ok(studentService.uploadProfilePicture(studentId, file));
+    }
+
 
     @DeleteMapping("/{studentId}")
     @Operation(
